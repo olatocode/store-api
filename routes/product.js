@@ -59,7 +59,7 @@ router.get('/find/:id', async (req, res) => {
   }
 });
 
-// GET ALL USER
+// GET ALL PRODUCT
 
 router.get('/', async (req, res) => {
   const qNew = req.query.new;

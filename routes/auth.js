@@ -6,17 +6,24 @@ const jwt = require('jsonwebtoken');
 
 // REGISTER
 router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body;
   const newUser = new User({
     username,
     email,
     password: CryptoJS.AES.encrypt(password, process.env.PASS_SEC).toString(),
   });
+  const existingUser = await User.findOne({ username, email, role });
+
+  if (existingUser) {
+    return res.status(409).json('User already exists');
+  }
 
   try {
     const saveUser = await newUser.save();
-    res.status(201).json(saveUser);
+    return res.status(201).json(saveUser);
   } catch (err) {
+    console.log(err);
+    if (err.code === 11000) return res.status(409).json('User already exists');
     res.status(500).json(err);
   }
 });
@@ -36,7 +43,7 @@ router.post('/login', async (req, res) => {
       process.env.PASS_SEC
     );
     const originalPassword = hashPassword.toString(CryptoJS.enc.Utf8);
-
+    
     const accessToken = jwt.sign(
       {
         id: user._id,
@@ -45,7 +52,7 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SEC,
       { expiresIn: '3d' }
     );
-
+    
     const { password, ...others } = user._doc;
     originalPassword !== password;
 
