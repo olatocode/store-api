@@ -1,7 +1,7 @@
 /** @format */
 
 const app = require('./app');
-const db = require('../config/database/db');
+const db = require('./config/database/db');
 
 // connect to the database
 db();
